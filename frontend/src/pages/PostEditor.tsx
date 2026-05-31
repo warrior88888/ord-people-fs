@@ -44,7 +44,7 @@ export default function PostEditor() {
   const [externalUrl, setExternalUrl] = useState("");
   const [tagIds, setTagIds] = useState<number[]>([]);
   const [photoFile, setPhotoFile] = useState<File | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<unknown>(null);
 
   useEffect(() => {
     if (isEdit && existing.data) {
@@ -80,7 +80,7 @@ export default function PostEditor() {
     delPhoto.mutate(undefined, {
       onError: (err) => {
         if (err instanceof ApiError && err.status === 404) return;
-        setError(err instanceof Error ? err.message : "Не удалось удалить фото");
+        setError(err);
       },
     });
   }
@@ -94,7 +94,7 @@ export default function PostEditor() {
       },
       onError: (err) => {
         setConfirmDelete(false);
-        setError(err instanceof Error ? err.message : "Не удалось удалить проект");
+        setError(err);
       },
     });
   }
@@ -143,7 +143,7 @@ export default function PostEditor() {
         navigate(`/posts/${created.pk}`);
       }
     } catch (err) {
-      setError((err as Error).message);
+      setError(err);
     }
   }
 
@@ -316,7 +316,7 @@ export default function PostEditor() {
           </div>
         </section>
 
-        {error && <ErrorAlert error={error} />}
+        {!!error && <ErrorAlert error={error} />}
 
         <section className="flex flex-wrap items-center gap-2 pt-4 border-t border-[var(--color-border)]">
           <button type="submit" className="btn btn-primary" disabled={busy}>

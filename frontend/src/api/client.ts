@@ -136,7 +136,8 @@ function formatValidationItem(item: { loc?: unknown; msg?: string; type?: string
   const fieldKey = loc.filter((p) => p !== "body" && p !== "query" && p !== "path").pop();
   const fieldLabel =
     typeof fieldKey === "string" ? FIELD_LABELS[fieldKey] ?? fieldKey : undefined;
-  const message = translatePydanticMessage(item.type, item.msg ?? "ошибка валидации");
+  const rawMsg = translatePydanticMessage(item.type, item.msg ?? "ошибка валидации");
+  const message = translateServerPhrase(rawMsg);
   return fieldLabel ? `Поле «${fieldLabel}»: ${message}` : message;
 }
 
@@ -154,6 +155,10 @@ const SERVER_PHRASES: Array<[RegExp, string]> = [
   [/rate limit/i, "Слишком много запросов. Попробуйте позже."],
   [/file too large|too large/i, "Файл слишком большой."],
   [/unsupported (media|file)/i, "Неподдерживаемый тип файла."],
+  [
+    /phone (must be|должен)|\+7\s*x{10,}/i,
+    "Телефон должен быть в формате +7XXXXXXXXXX (11 цифр, начиная с +7).",
+  ],
 ];
 
 function translateServerPhrase(s: string): string {

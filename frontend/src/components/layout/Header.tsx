@@ -119,6 +119,27 @@ export function Header() {
           style={{ background: "linear-gradient(135deg, #1f6fe5, #0f4faa)" }}
         >
           <div className="max-w-6xl mx-auto px-4 sm:px-6 py-3 flex flex-col">
+            {me.data && (
+              <Link
+                to={`/users/${me.data.username}`}
+                onClick={() => setMobileOpen(false)}
+                className="flex items-center gap-3 px-1 py-3 border-b border-white/15"
+              >
+                <Avatar
+                  url={me.data.avatar_url}
+                  username={me.data.username}
+                  firstName={me.data.first_name}
+                  lastName={me.data.last_name}
+                  size={32}
+                />
+                <span className="flex flex-col leading-tight">
+                  <span className="text-base font-semibold text-white truncate">
+                    {me.data.first_name} {me.data.last_name}
+                  </span>
+                  <span className="text-xs text-white/70 truncate">Мой профиль</span>
+                </span>
+              </Link>
+            )}
             {NAV.map((item) => (
               <NavLink
                 key={item.to}

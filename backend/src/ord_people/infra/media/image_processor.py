@@ -4,7 +4,7 @@ import asyncio
 import io
 import logging
 
-from PIL import Image, UnidentifiedImageError
+from PIL import Image, ImageOps, UnidentifiedImageError
 from pillow_heif import register_heif_opener
 
 from ord_people.config.constatns.media import (
@@ -48,6 +48,9 @@ class PillowImageProcessor:
                     )
                     raise UnsupportedImageTypeError
                 original_size = img.size
+                # iPhone JPEGs encode orientation in EXIF rather than in the
+                # pixel data; without this they appear sideways after re-encode.
+                img = ImageOps.exif_transpose(img)
                 img = img.convert("RGB")
                 img.thumbnail(self._max_size)
                 out = io.BytesIO()

@@ -39,3 +39,9 @@ dist-ssr/
 
 # Playwright
 .playwright-mcp/
+
+# Local screenshots / scratch
+.screenshots/
+
+# Tool caches
+.ty_cache/

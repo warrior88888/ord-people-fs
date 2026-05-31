@@ -29,7 +29,7 @@ export function ProfileEditor({ user, onDone }: { user: User; onDone: () => void
   const [max, setMax] = useState(user.bio?.max_link ?? "");
 
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<unknown>(null);
 
   const updMe = useUpdateMe();
   const updBio = useUpdateBio();
@@ -59,7 +59,7 @@ export function ProfileEditor({ user, onDone }: { user: User; onDone: () => void
     delAvatar.mutate(undefined, {
       onError: (err) => {
         if (err instanceof ApiError && err.status === 404) return; // already gone
-        setError(err instanceof Error ? err.message : "Не удалось удалить аватар");
+        setError(err);
       },
     });
   }
@@ -72,7 +72,7 @@ export function ProfileEditor({ user, onDone }: { user: User; onDone: () => void
       },
       onError: (err) => {
         setConfirmDeleteMe(false);
-        setError(err instanceof Error ? err.message : "Не удалось удалить профиль");
+        setError(err);
       },
     });
   }
@@ -111,7 +111,7 @@ export function ProfileEditor({ user, onDone }: { user: User; onDone: () => void
       }
       onDone();
     } catch (err) {
-      setError((err as Error).message);
+      setError(err);
     }
   }
 
@@ -146,7 +146,7 @@ export function ProfileEditor({ user, onDone }: { user: User; onDone: () => void
         </div>
 
         {/* AVATAR — overlaps the seam */}
-        <div className="px-6 md:px-8 -mt-12 relative z-10 flex items-end gap-4">
+        <div className="px-4 sm:px-6 md:px-8 -mt-12 relative z-10 flex items-end gap-4">
           <div className="relative">
             {avatarFile ? (
               <ImagePreview
@@ -183,37 +183,42 @@ export function ProfileEditor({ user, onDone }: { user: User; onDone: () => void
               />
             </label>
           </div>
-          <div className="pb-1 min-w-0">
+          <div className="pb-1 min-w-0 flex-1">
             <p className="text-sm font-semibold text-[var(--color-ink)] truncate">
               {firstName} {lastName}
             </p>
-            <p className="text-xs text-[var(--color-muted)] truncate">@{user.username}</p>
-            <div className="mt-1 flex flex-wrap gap-x-3 gap-y-1 text-xs">
-              {avatarFile && (
-                <button
-                  type="button"
-                  className="text-[var(--color-muted)] hover:text-brand"
-                  onClick={() => setAvatarFile(null)}
-                >
-                  Отменить выбор
-                </button>
-              )}
-              {canRemoveAvatar && (
-                <button
-                  type="button"
-                  className="text-[var(--color-muted)] hover:text-[#b91c1c] disabled:opacity-50 disabled:cursor-not-allowed"
-                  onClick={() => setConfirmAvatar(true)}
-                  disabled={delAvatar.isPending}
-                >
-                  {delAvatar.isPending ? "Удаление…" : "Удалить аватар"}
-                </button>
-              )}
-            </div>
+            <p className="text-xs text-[var(--color-muted)] truncate">
+              @{user.username}
+            </p>
           </div>
         </div>
 
+        {(avatarFile || canRemoveAvatar) && (
+          <div className="px-4 sm:px-6 md:px-8 mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs">
+            {avatarFile && (
+              <button
+                type="button"
+                className="text-[var(--color-muted)] hover:text-brand transition-colors"
+                onClick={() => setAvatarFile(null)}
+              >
+                Отменить выбор
+              </button>
+            )}
+            {canRemoveAvatar && (
+              <button
+                type="button"
+                className="text-[var(--color-muted)] hover:text-[#b91c1c] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                onClick={() => setConfirmAvatar(true)}
+                disabled={delAvatar.isPending}
+              >
+                {delAvatar.isPending ? "Удаление…" : "Удалить аватар"}
+              </button>
+            )}
+          </div>
+        )}
+
         {/* BODY */}
-        <div className="px-6 md:px-8 pt-8 pb-8 flex flex-col gap-8">
+        <div className="px-4 sm:px-6 md:px-8 pt-8 pb-8 flex flex-col gap-8">
           <section
             className="relative"
             style={{ borderLeft: `3px solid ${ACCENT_FROM}55`, paddingLeft: "1.25rem" }}
@@ -264,18 +269,23 @@ export function ProfileEditor({ user, onDone }: { user: User; onDone: () => void
             </div>
           </section>
 
-          {error && <ErrorAlert error={error} />}
+          {!!error && <ErrorAlert error={error} />}
 
-          <section className="flex flex-wrap items-center gap-2 pt-4 border-t border-[var(--color-border)]">
-            <button type="submit" className="btn btn-primary" disabled={busy}>
+          <section className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-2 pt-4 border-t border-[var(--color-border)]">
+            <button type="submit" className="btn btn-primary w-full sm:w-auto" disabled={busy}>
               {busy ? "Сохранение…" : "Сохранить изменения"}
             </button>
-            <button type="button" className="btn btn-outline" onClick={onDone} disabled={busy}>
+            <button
+              type="button"
+              className="btn btn-outline w-full sm:w-auto"
+              onClick={onDone}
+              disabled={busy}
+            >
               Отмена
             </button>
             <button
               type="button"
-              className="btn btn-danger ml-auto"
+              className="btn btn-danger w-full sm:w-auto sm:ml-auto"
               onClick={() => setConfirmDeleteMe(true)}
               disabled={delMe.isPending}
             >

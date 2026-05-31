@@ -69,11 +69,16 @@ function defaultTitle(error: unknown): string {
     if (error.status === 403) return "Доступ запрещён";
     if (error.status === 404) return "Не найдено";
     if (error.status === 409) return "Конфликт данных";
+    if (error.status === 413) return "Файл слишком большой";
+    if (error.status === 415) return "Неподдерживаемый тип файла";
     if (error.status === 422) return "Проверьте поля формы";
     if (error.status === 429) return "Слишком часто";
     if (error.status >= 500) return "Ошибка сервера";
+    return "Не удалось выполнить запрос";
   }
-  return "Что-то пошло не так";
+  // Plain string / generic Error from local validation: the message itself is
+  // the user-facing text — a generic title would just add noise.
+  return "";
 }
 
 function normalizeMessages(error: unknown): string[] {

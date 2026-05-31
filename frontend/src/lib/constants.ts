@@ -1,12 +1,35 @@
 export const PAGE_SIZE = 20;
 
 // Keep in sync with backend ALLOWED_IMAGE_CONTENT_TYPES and IMAGE_INPUT_MAX_SIZE.
-// HEIC/HEIF entries make iPhone photos selectable in pickers that don't expand
-// `image/*` to Apple formats (some Android browsers, file dialogs in older OSes).
+// `image/*` already covers most mobile pickers, but iOS Safari and some Android
+// browsers won't show files of a given type unless we name the extension or
+// MIME explicitly. We list every realistic camera/share-sheet format here so
+// HEIC, AVIF, etc. are always tappable.
 export const IMAGE_MAX_BYTES = 12 * 1024 * 1024;
 export const IMAGE_MAX_LABEL = "12 МБ";
-export const IMAGE_ACCEPT =
-  "image/jpeg,image/png,image/webp,image/gif,image/heic,image/heif,.heic,.heif";
+export const IMAGE_ACCEPT = [
+  "image/*",
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/gif",
+  "image/heic",
+  "image/heif",
+  "image/avif",
+  "image/bmp",
+  "image/tiff",
+  ".jpg",
+  ".jpeg",
+  ".png",
+  ".webp",
+  ".gif",
+  ".heic",
+  ".heif",
+  ".avif",
+  ".bmp",
+  ".tif",
+  ".tiff",
+].join(",");
 
 export const CATEGORIES = [
   { value: "story", label: "История" },
