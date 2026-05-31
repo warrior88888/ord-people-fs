@@ -1,0 +1,21 @@
+node_modules
+dist
+dist-ssr
+.vite
+*.local
+.env
+.env.*
+!.env.example
+.git
+.gitignore
+.idea
+.playwright-mcp
+*.tsbuildinfo
+*.log
+.DS_Store
+README.md
+.claude/
+# CI configs that are never used in the image
+.github/
+Dockerfile
+.dockerignore
