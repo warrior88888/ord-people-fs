@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pytest
 
-from tests.helpers.media import jpeg_bytes, oversized_bytes, png_bytes
+from tests.helpers.media import heic_bytes, jpeg_bytes, oversized_bytes, png_bytes
 from tests.helpers.payloads import VALID_PASSWORD, above_max, below_min
 
 
@@ -209,6 +209,15 @@ class TestAvatarUpload:
             files={"file": ("a.jpg", jpeg_bytes(), "image/jpeg")},
         )
         assert r.status_code == 200
+
+    async def test_happy_heic_from_iphone(self, auth_client, app):
+        client, _ = auth_client
+        r = await client.put(
+            "/api/v1/users/me/avatar",
+            files={"file": ("IMG_1234.HEIC", heic_bytes(), "image/heic")},
+        )
+        assert r.status_code == 200
+        assert len(app.state.storage.objects) == 1
 
     async def test_oversized_rejected(self, auth_client):
         client, _ = auth_client

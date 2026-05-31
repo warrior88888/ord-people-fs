@@ -18,7 +18,7 @@ server {
     listen 80;
     server_name ${SPA_DOMAIN} ${API_DOMAIN} localhost;
 
-    client_max_body_size 10M;
+    client_max_body_size 15M;
 
     access_log /var/log/nginx/access.log;
     error_log  /var/log/nginx/error.log info;

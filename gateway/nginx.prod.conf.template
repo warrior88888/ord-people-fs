@@ -98,7 +98,7 @@ server {
     error_log  /var/log/nginx/error.log warn;
 
     keepalive_timeout 75;
-    client_max_body_size 10M;
+    client_max_body_size 15M;
     client_body_timeout 10s;
     client_header_timeout 10s;
     send_timeout 15s;

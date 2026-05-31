@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import pytest
 
+from ord_people.config.constatns.media import IMAGE_INPUT_MAX_SIZE
 from ord_people.exceptions import AvatarTooLargeError, UserNotFoundError
 from ord_people.schemas.bio import BioUpdateSchema
 from ord_people.schemas.user import UserUpdateSchema
@@ -59,7 +60,7 @@ async def test_update_bio_unknown(user_service):
 async def test_upload_avatar_too_large(user_service, user_factory):
     u = await user_factory()
     with pytest.raises(AvatarTooLargeError):
-        await user_service.upload_avatar(u.pk, b"\x00" * (10 * 1024 * 1024))
+        await user_service.upload_avatar(u.pk, b"\x00" * (IMAGE_INPUT_MAX_SIZE + 1))
 
 
 async def test_upload_avatar_happy(user_service, user_factory, storage):

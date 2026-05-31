@@ -7,7 +7,7 @@ from PIL import Image
 
 from ord_people.exceptions import InvalidImageError, UnsupportedImageTypeError
 from ord_people.infra.media.image_processor import PillowImageProcessor
-from tests.helpers.media import garbage_bytes, jpeg_bytes, png_bytes
+from tests.helpers.media import garbage_bytes, heic_bytes, jpeg_bytes, png_bytes
 
 
 @pytest.fixture
@@ -49,3 +49,17 @@ async def test_unsupported_format_rejected(processor):
     Image.new("RGB", (8, 8)).save(buf, format="BMP")
     with pytest.raises(UnsupportedImageTypeError):
         await processor.to_webp(buf.getvalue())
+
+
+async def test_heic_from_iphone_converted_to_webp(processor):
+    # iPhone photos arrive as HEIC; pillow_heif teaches Pillow to decode them.
+    out = await processor.to_webp(heic_bytes((32, 32)))
+    assert out[:4] == b"RIFF"
+    assert b"WEBP" in out[:16]
+
+
+async def test_heic_oversized_resize_caps(processor):
+    out = await processor.to_webp(heic_bytes((300, 300)))
+    with Image.open(io.BytesIO(out)) as img:
+        assert img.size[0] <= 64
+        assert img.size[1] <= 64

@@ -5,6 +5,7 @@ import io
 import logging
 
 from PIL import Image, UnidentifiedImageError
+from pillow_heif import register_heif_opener
 
 from ord_people.config.constatns.media import (
     ALLOWED_IMAGE_FORMATS,
@@ -12,6 +13,10 @@ from ord_people.config.constatns.media import (
     IMAGE_OUTPUT_QUALITY,
 )
 from ord_people.exceptions import InvalidImageError, UnsupportedImageTypeError
+
+# Teach Pillow to read iPhone HEIC/HEIF photos. Idempotent — safe to call at
+# import time; subsequent calls in tests or reloads are no-ops.
+register_heif_opener()
 
 logger = logging.getLogger(__name__)
 
