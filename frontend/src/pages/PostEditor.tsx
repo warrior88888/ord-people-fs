@@ -12,7 +12,13 @@ import { ApiError } from "../api/client";
 import { ConfirmDialog } from "../components/ui/ConfirmDialog";
 import { ErrorAlert } from "../components/ui/ErrorAlert";
 import { useTags } from "../api/queries/tags";
-import { CATEGORIES, type CategoryValue } from "../lib/constants";
+import {
+  CATEGORIES,
+  type CategoryValue,
+  IMAGE_ACCEPT,
+  IMAGE_MAX_BYTES,
+  IMAGE_MAX_LABEL,
+} from "../lib/constants";
 import { CenterSpinner } from "../components/ui/Spinner";
 import { ImagePreview } from "../components/ImagePreview";
 import { api, MEDIA_BASE_URL } from "../api/client";
@@ -104,8 +110,8 @@ export default function PostEditor() {
 
   function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0] ?? null;
-    if (file && file.size > 10 * 1024 * 1024) {
-      setError("Изображение не должно превышать 10 МБ.");
+    if (file && file.size > IMAGE_MAX_BYTES) {
+      setError(`Изображение не должно превышать ${IMAGE_MAX_LABEL}.`);
       e.target.value = "";
       return;
     }
@@ -180,7 +186,7 @@ export default function PostEditor() {
           <div className="mt-3 flex flex-wrap items-center gap-2">
             <label className="btn btn-outline cursor-pointer">
               {photoFile || existingPhoto ? "Заменить фото" : "Добавить фото"}
-              <input type="file" accept="image/*" className="hidden" onChange={handleFile} />
+              <input type="file" accept={IMAGE_ACCEPT} className="hidden" onChange={handleFile} />
             </label>
             {photoFile && (
               <button

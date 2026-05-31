@@ -9,6 +9,7 @@ import {
   useUploadAvatar,
 } from "../api/queries/users";
 import { ApiError } from "../api/client";
+import { IMAGE_ACCEPT, IMAGE_MAX_BYTES, IMAGE_MAX_LABEL } from "../lib/constants";
 import { Avatar } from "../components/Avatar";
 import { ImagePreview } from "../components/ImagePreview";
 import { ConfirmDialog } from "../components/ui/ConfirmDialog";
@@ -82,8 +83,8 @@ export function ProfileEditor({ user, onDone }: { user: User; onDone: () => void
       setAvatarFile(null);
       return;
     }
-    if (file.size > 5 * 1024 * 1024) {
-      setError("Размер файла не должен превышать 5 МБ.");
+    if (file.size > IMAGE_MAX_BYTES) {
+      setError(`Размер файла не должен превышать ${IMAGE_MAX_LABEL}.`);
       e.target.value = "";
       return;
     }
@@ -176,7 +177,7 @@ export function ProfileEditor({ user, onDone }: { user: User; onDone: () => void
               </svg>
               <input
                 type="file"
-                accept="image/*"
+                accept={IMAGE_ACCEPT}
                 className="hidden"
                 onChange={handleAvatarChange}
               />
