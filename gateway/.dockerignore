@@ -1,0 +1,7 @@
+# Deny-list everything by default; we only want the four files we explicitly COPY.
+# These patterns belt-and-braces the COPY commands in the Dockerfile.
+*
+!Dockerfile
+!docker-entrypoint.sh
+!nginx.dev.conf.template
+!nginx.prod.conf.template
