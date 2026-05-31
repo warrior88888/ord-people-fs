@@ -5,7 +5,7 @@ set -e
 : "${SPA_DOMAIN:=localhost}"
 : "${API_DOMAIN:=localhost}"
 
-src="/etc/nginx/templates/nginx.${NGINX_ENV}.conf.template"
+src="/etc/gateway/nginx.${NGINX_ENV}.conf.template"
 dst="/etc/nginx/conf.d/default.conf"
 
 if [ ! -f "$src" ]; then
