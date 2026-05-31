@@ -13,7 +13,7 @@ class LoggingConfig(BaseModel):
     json_logs: bool = False
     access_log: bool = True
     to_file: bool = False
-    file_path: str = "logs/backend.log"
+    file_path: str = "/var/log/ord-people/backend.log"
     file_max_size_mb: int = 10
     file_backup_count: int = 5
     slow_request_ms: int = 1000

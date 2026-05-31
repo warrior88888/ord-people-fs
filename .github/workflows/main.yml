@@ -187,7 +187,15 @@ jobs:
           script: |
             set -e
             cd /opt/ord-people
-            mkdir -p /var/log/ord-people /var/log/nginx
+            # /var/log/ord-people is bind-mounted into the backend container,
+            # which runs as uid 999 (the `ord` user from backend/Dockerfile).
+            # Idempotent: only invoke sudo when ownership is wrong, so reruns
+            # after the one-time fix don't need NOPASSWD.
+            if [ ! -d /var/log/ord-people ] || [ "$(stat -c %u /var/log/ord-people)" != "999" ]; then
+              sudo -n mkdir -p /var/log/ord-people /var/log/nginx
+              sudo -n chown -R 999:999 /var/log/ord-people
+              sudo -n chmod 755 /var/log/ord-people
+            fi
             echo "DEBUG: BACKEND_IMAGE=[$BACKEND_IMAGE]"
             echo "DEBUG: FRONTEND_IMAGE=[$FRONTEND_IMAGE]"
             echo "DEBUG: GATEWAY_IMAGE=[$GATEWAY_IMAGE]"

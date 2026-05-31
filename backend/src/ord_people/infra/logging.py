@@ -2,7 +2,9 @@ from __future__ import annotations
 
 import logging
 import logging.config
+import os
 from contextvars import ContextVar
+from pathlib import Path
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -10,6 +12,23 @@ if TYPE_CHECKING:
 
 request_id_var: ContextVar[str] = ContextVar("request_id", default="-")
 user_id_var: ContextVar[str] = ContextVar("user_id", default="-")
+
+
+def _file_handler_ready(file_path: str) -> bool:
+    """Make file logging best-effort: never crash app boot because of it.
+
+    Tries to mkdir the parent and touch the file. On any OSError logs a warning
+    to stderr and returns False so the caller skips the file handler entirely.
+    """
+    try:
+        path = Path(file_path)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        with path.open("a", encoding="utf-8"):
+            pass
+    except OSError as exc:
+        os.write(2, f"logging: file handler disabled ({file_path}): {exc}\n".encode())
+        return False
+    return True
 
 
 class ContextFilter(logging.Filter):
@@ -33,7 +52,7 @@ def setup_logging(config: LoggingConfig) -> None:
 
     root_handlers = ["console"]
 
-    if config.to_file:
+    if config.to_file and _file_handler_ready(config.file_path):
         handlers["file"] = {
             "class": "logging.handlers.RotatingFileHandler",
             "filename": config.file_path,
@@ -42,6 +61,10 @@ def setup_logging(config: LoggingConfig) -> None:
             "formatter": "default",
             "filters": ["context"],
             "encoding": "utf-8",
+            # delay=True: don't open the file at handler construction —
+            # only on first emit. Keeps the app bootable even if the
+            # mount permission is fixed lazily.
+            "delay": True,
         }
         root_handlers.append("file")
 
