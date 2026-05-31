@@ -1,0 +1,155 @@
+x-logging: &default-logging
+  driver: json-file
+  options:
+    max-size: "100m"
+    max-file: "10"
+
+services:
+  postgres:
+    image: postgres:17.10-alpine3.23
+    container_name: ord_people_postgres
+    env_file:
+      - .env
+    environment:
+      POSTGRES_USER: ${ORD__POSTGRES__USER}
+      POSTGRES_PASSWORD: ${ORD__POSTGRES__PASSWORD}
+      POSTGRES_DB: ${ORD__POSTGRES__DB}
+    networks:
+      - postgres_network
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    mem_limit: ${POSTGRES_MEMORY_LIMIT}
+    command: >
+      postgres
+      -c max_connections=${POSTGRES_MAX_CONNECTIONS:-20}
+      -c shared_buffers=${POSTGRES_SHARED_BUFFERS:-128MB}
+      -c work_mem=${POSTGRES_WORK_MEM:-4MB}
+      -c maintenance_work_mem=${POSTGRES_MAINTENANCE_WORK_MEM:-32MB}
+      -c effective_cache_size=${POSTGRES_EFFECTIVE_CACHE_SIZE:-384MB}
+      -c wal_buffers=4MB
+      -c checkpoint_completion_target=0.9
+      -c random_page_cost=1.1
+    stop_grace_period: 30s
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
+    logging: *default-logging
+    restart: unless-stopped
+
+  redis:
+    image: redis:8.6.3-alpine3.23
+    container_name: ord_people_redis
+    env_file:
+      - .env
+    environment:
+      REDIS_PASSWORD: ${ORD__REDIS__PASSWORD}
+      REDIS_PORT: ${ORD__REDIS__PORT:-6379}
+    command: >
+      redis-server
+      --requirepass ${ORD__REDIS__PASSWORD}
+      --port ${ORD__REDIS__PORT:-6379}
+      --maxmemory ${REDIS_MAXMEMORY:-128mb}
+      --maxmemory-policy volatile-ttl
+    networks:
+      - redis_network
+    volumes:
+      - redis_data:/data
+    mem_limit: ${REDIS_MEMORY_LIMIT}
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli -p $$REDIS_PORT -a $$REDIS_PASSWORD ping | grep PONG"]
+      interval: 5s
+      timeout: 3s
+      retries: 3
+    logging: *default-logging
+    restart: unless-stopped
+
+  backend:
+    image: ${BACKEND_IMAGE}
+    container_name: ord_people_backend
+    env_file:
+      - .env
+    environment:
+      ORD__APP__DEBUG: "false"
+      ORD__APP__COOKIE_SECURE: "true"
+      ORD__APP__BEHIND_PROXY: "true"
+      ORD__APP__FORWARDED_ALLOW_IPS: "*"
+      ORD__APP__CONTAINER_NAME: "ord_people_backend"
+      ORD__POSTGRES__HOST: "postgres"
+      ORD__REDIS__HOST: "redis"
+      FORWARDED_ALLOW_IPS: "*"
+      GUNICORN_WORKERS: ${GUNICORN_WORKERS:-3}
+    networks:
+      - backend_network
+      - redis_network
+      - postgres_network
+    volumes:
+      - /var/log/ord-people:/var/log/ord-people
+    mem_limit: ${BACKEND_MEMORY_LIMIT}
+    mem_reservation: ${BACKEND_MEMORY_RESERVE}
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://localhost:8000/ht').status==200 else 1)"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 20s
+    logging: *default-logging
+    restart: unless-stopped
+
+  frontend:
+    image: ${FRONTEND_IMAGE}
+    container_name: ord_people_frontend
+    volumes:
+      - spa_dist:/spa
+    restart: "no"
+    logging: *default-logging
+
+  gateway:
+    image: ${GATEWAY_IMAGE}
+    container_name: ord_people_gateway
+    ports:
+      - "80:80"
+      - "443:443"
+    env_file:
+      - .env
+    environment:
+      NGINX_ENV: prod
+      SPA_DOMAIN: ${SPA_DOMAIN}
+      API_DOMAIN: ${API_DOMAIN}
+    networks:
+      - backend_network
+    volumes:
+      - spa_dist:/usr/share/nginx/html:ro
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+      - /var/www/certbot:/var/www/certbot:ro
+      - /var/log/nginx:/var/log/nginx
+    mem_limit: ${NGINX_MEMORY_LIMIT}
+    depends_on:
+      backend:
+        condition: service_healthy
+      frontend:
+        condition: service_completed_successfully
+    logging: *default-logging
+    restart: unless-stopped
+
+networks:
+  backend_network:
+    driver: bridge
+  postgres_network:
+    driver: bridge
+    internal: true
+  redis_network:
+    driver: bridge
+    internal: true
+
+volumes:
+  pg_data:
+  redis_data:
+  spa_dist:
