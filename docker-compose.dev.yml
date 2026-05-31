@@ -69,6 +69,9 @@ services:
       ORD__LOG__LEVEL: "DEBUG"
       FORWARDED_ALLOW_IPS: "*"
       GUNICORN_WORKERS: "2"
+      # S3 credentials come from .env (ORD__S3__ACCESS_KEY / SECRET_KEY /
+      # ENDPOINT_URL / BUCKET_NAME / PUBLIC_URL) — same source as prod.
+      # No local media bucket; dev points at the real S3-compatible store.
     depends_on:
       postgres:
         condition: service_healthy
@@ -88,7 +91,8 @@ services:
       context: ./frontend
       args:
         VITE_API_BASE_URL: "/api/v1"
-        VITE_MEDIA_BASE_URL: "http://localhost:8000/media"
+        # Real S3 public URL — same value backend resolves to ORD__S3__PUBLIC_URL.
+        VITE_MEDIA_BASE_URL: ${ORD__S3__PUBLIC_URL:?ORD__S3__PUBLIC_URL must be set in .env}
     container_name: ord_people_frontend
     volumes:
       - spa_dist:/spa

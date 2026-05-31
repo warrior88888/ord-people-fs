@@ -33,11 +33,6 @@ server {
         proxy_pass http://backend_upstream;
     }
 
-    # Static media served by the backend (S3 in real life, but the backend has a /media route for dev)
-    location /media/ {
-        proxy_pass http://backend_upstream;
-    }
-
     # Backend admin
     location /admin {
         proxy_pass http://backend_upstream;
