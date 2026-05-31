@@ -1,0 +1,192 @@
+[project]
+name = "ord-people"
+version = "0.1.0"
+requires-python = ">=3.14"
+
+dependencies = [
+    "aiobotocore>=3.7.0",
+    "alembic>=1.18.4",
+    "argon2-cffi>=25.1.0",
+    "asyncpg>=0.31.0",
+    "certifi>=2026.4.22",
+    "email-validator>=2.2.0",
+    "fastapi[standard]>=0.136.1",
+    "greenlet>=3.5.0",
+    "gunicorn>=26.0.0",
+    "itsdangerous>=2.2.0",
+    "pillow>=12.2.0",
+    "pydantic>=2.13.4",
+    "pydantic-settings>=2.14.1",
+    "redis>=7.4.0",
+    "sqlalchemy>=2.0.49",
+    "starlette>=1.1.0",
+]
+
+[dependency-groups]
+dev = [
+    "aiosqlite>=0.22.1",
+    "factory-boy>=3.3.3",
+    "freezegun>=1.5.1",
+    "httpx>=0.28.0",
+    "pytest>=9.0.3",
+    "pytest-asyncio>=0.25.0",
+    "pytest-cov>=5.0.0",
+    "pytest-env>=1.6.0",
+    "pytest-factoryboy>=2.8.1",
+    "ruff>=0.15.12",
+    "ty>=0.0.35",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/ord_people"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.coverage.run]
+branch = true
+source = ["src/ord_people"]
+omit = [
+    "src/ord_people/main.py",
+    "src/ord_people/lifespan.py",
+    "src/ord_people/middleware.py",
+    "src/ord_people/infra/storage/s3.py",
+    "src/ord_people/infra/admin.py",
+    "src/ord_people/config/rate.py",
+    "src/ord_people/infra/logging.py",
+]
+
+[tool.coverage.report]
+fail_under = 90
+show_missing = true
+exclude_lines = [
+    "pragma: no cover",
+    "if TYPE_CHECKING:",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+pythonpath = ["src"]
+testpaths = ["tests"]
+addopts = "-ra --strict-markers --strict-config"
+filterwarnings = [
+    "ignore::DeprecationWarning",
+]
+env = [
+    "ORD__ADMIN__USERNAME=admin",
+    "ORD__ADMIN__PASSWORD=admin-pass",
+    "ORD__ADMIN__FIRST_NAME=Admin",
+    "ORD__ADMIN__LAST_NAME=Root",
+    "ORD__AUTH__PEPPER=test-pepper",
+    "ORD__POSTGRES__PASSWORD=test",
+    "ORD__S3__ACCESS_KEY=test",
+    "ORD__S3__SECRET_KEY=test",
+    "ORD__S3__ENDPOINT_URL=http://localhost:9000",
+    "ORD__S3__BUCKET_NAME=test",
+    "ORD__S3__PUBLIC_URL=http://localhost:9000",
+    "ORD__APP__COOKIE_SECURE=false",
+]
+
+[tool.fastapi]
+entrypoint = "src.ord_people.main:app"
+
+[tool.ruff]
+# Exclude a variety of commonly ignored directories.
+exclude = [
+    ".bzr",
+    ".direnv",
+    ".eggs",
+    ".git",
+    ".git-rewrite",
+    ".hg",
+    ".ipynb_checkpoints",
+    ".mypy_cache",
+    ".nox",
+    ".pants.d",
+    ".pyenv",
+    ".pytest_cache",
+    ".pytype",
+    ".ruff_cache",
+    ".svn",
+    ".tox",
+    ".venv",
+    ".vscode",
+    "__pypackages__",
+    "_build",
+    "buck-out",
+    "build",
+    "dist",
+    "node_modules",
+    "site-packages",
+    "venv",
+    "migrations",
+]
+
+# Same as Black.
+line-length = 88
+indent-width = 4
+
+# Assume Python 3.14
+target-version = "py314"
+
+[tool.ruff.lint]
+select = [
+    "ASYNC",
+    "T20",
+    "F",
+    "E",
+    "I",
+    "N",
+    "UP",
+    "RUF",
+    "B",
+    "C4",
+    "ISC",
+    "PIE",
+    "PT",
+    "PTH",
+    "SIM",
+    "TID",
+    #    "TC",
+    "S",
+    "W",
+]
+ignore = []
+
+# Allow fix for all enabled rules (when `--fix`) is provided.
+fixable = ["ALL"]
+unfixable = []
+
+# Allow unused variables when underscore-prefixed.
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
+[tool.ruff.format]
+# Like Black, use double quotes for strings.
+quote-style = "double"
+
+# Like Black, indent with spaces, rather than tabs.
+indent-style = "space"
+
+# Like Black, respect magic trailing commas.
+skip-magic-trailing-comma = false
+
+# Like Black, automatically detect the appropriate line ending.
+line-ending = "auto"
+
+docstring-code-format = true
+docstring-code-line-length = 88
+
+[tool.ruff.lint.flake8-bugbear]
+extend-immutable-calls = ["fastapi.Depends", "fastapi.Query", "fastapi.Header", "fastapi.Body"]
+
+[tool.ruff.lint.per-file-ignores]
+"*/migrations/*" = ["ALL"]
+"src/ord_people/config/*.py" = ["TC001"]
+"src/ord_people/config/log.py" = ["E501"]
+"src/ord_people/models/*.py" = ["TC001", "TC003"]
+"tests/**/*.py" = ["S101", "S105", "S106", "S107", "S311", "ASYNC", "E501", "B008"]
+"src/ord_people/infra/admin.py" = ["RUF012"]

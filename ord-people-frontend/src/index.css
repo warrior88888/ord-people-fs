@@ -1,0 +1,115 @@
+@import "tailwindcss";
+
+@theme {
+  --color-brand: #1f6fe5;
+  --color-brand-deep: #0f4faa;
+  --color-brand-soft: #3aa6e0;
+  --color-ink: #0f172a;
+  --color-muted: #64748b;
+  --color-surface: #f5f8fc;
+  --color-border: #e2e8f0;
+
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+
+  --radius-card: 16px;
+  --radius-control: 10px;
+}
+
+html, body, #root { height: 100%; }
+
+body {
+  font-family: var(--font-sans);
+  color: var(--color-ink);
+  background: #f8fafc;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+a { color: inherit; text-decoration: none; }
+
+/* Cards */
+.card {
+  background: #fff;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  transition: box-shadow .15s ease, border-color .15s ease;
+}
+.card:hover {
+  box-shadow: 0 6px 22px -14px rgba(15, 23, 42, 0.18);
+  border-color: #cbd5e1;
+}
+
+/* Buttons */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: .5rem;
+  padding: .6rem 1.1rem; border-radius: 8px;
+  font-weight: 500; font-size: .9rem; line-height: 1;
+  transition: background .15s ease, color .15s ease, border-color .15s ease;
+  border: 1px solid transparent; cursor: pointer;
+}
+.btn-primary { background: var(--color-brand); color: #fff; }
+.btn-primary:hover { background: var(--color-brand-deep); }
+.btn-primary:disabled { background: #93b8ec; cursor: not-allowed; }
+.btn-outline {
+  background: #fff;
+  border-color: var(--color-border);
+  color: var(--color-ink);
+}
+.btn-outline:hover {
+  background: var(--color-surface);
+  border-color: #cbd5e1;
+}
+.btn-ghost { background: transparent; color: var(--color-brand); }
+.btn-ghost:hover { background: rgba(31, 111, 229, 0.08); color: var(--color-brand-deep); }
+.btn-danger { background: #ef4444; color: #fff; box-shadow: 0 4px 14px -4px rgba(239, 68, 68, 0.45); }
+.btn-danger:hover { background: #dc2626; }
+
+/* Form controls */
+.input, .textarea, .select {
+  width: 100%; border: 1px solid var(--color-border); border-radius: var(--radius-control);
+  padding: .65rem .85rem; font-size: .95rem; background: #fff; color: var(--color-ink);
+  transition: border-color .15s ease, box-shadow .15s ease;
+}
+.input:focus, .textarea:focus, .select:focus {
+  outline: none; border-color: var(--color-brand);
+  box-shadow: 0 0 0 4px rgba(31, 111, 229, 0.12);
+}
+.textarea { min-height: 120px; resize: vertical; line-height: 1.5; }
+
+/* Misc */
+.link { color: var(--color-brand); }
+.link:hover { text-decoration: underline; }
+
+.tag-pill {
+  display: inline-flex; align-items: center;
+  padding: 4px 10px; font-size: .75rem;
+  border: 1px solid var(--color-border); border-radius: 999px;
+  color: var(--color-muted); background: #fff;
+  transition: border-color .15s ease, color .15s ease, background .15s ease;
+}
+.tag-pill:hover { border-color: #94a3b8; color: var(--color-ink); }
+
+.category-chip {
+  display: inline-flex; align-items: center;
+  padding: .55rem 1rem; font-size: .9rem; font-weight: 500;
+  border: 1px solid var(--color-border); border-radius: 999px;
+  color: var(--color-ink); background: #fff; cursor: pointer;
+  transition: border-color .15s ease, color .15s ease, background .15s ease, box-shadow .15s ease;
+}
+.category-chip:hover { border-color: var(--color-brand); color: var(--color-brand); }
+.category-chip:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(31, 111, 229, 0.18);
+  border-color: var(--color-brand);
+}
+.category-chip--on {
+  background: linear-gradient(135deg, var(--color-brand), var(--color-brand-deep));
+  border-color: var(--color-brand-deep);
+  color: #fff;
+  box-shadow: 0 6px 16px -8px rgba(15, 79, 170, 0.5);
+}
+.category-chip--on:hover { color: #fff; border-color: var(--color-brand-deep); }
+
+.clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.clamp-3 { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }

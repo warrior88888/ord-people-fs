@@ -1,0 +1,41 @@
+# OS
+.DS_Store
+
+# IDE
+.idea/
+*.iml
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.venv/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+.coverage.*
+htmlcov/
+
+# Node
+node_modules/
+dist/
+dist-ssr/
+*.tsbuildinfo
+.vite/
+*.local
+
+# Environment files - never commit, see .env.example
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+
+# Claude
+.claude/
+
+# Playwright
+.playwright-mcp/

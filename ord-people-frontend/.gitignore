@@ -1,0 +1,18 @@
+node_modules
+dist
+dist-ssr
+*.local
+.vite
+.DS_Store
+
+# Environment files - never commit, see .env.example
+.env
+.env.*
+!.env.example
+
+*.log
+.idea
+.playwright-mcp
+*.tsbuildinfo
+
+.claude/
