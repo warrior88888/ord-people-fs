@@ -65,11 +65,11 @@ def build_lifespan(engine, session_factory, redis_client):
         app.state.cache = cache
         app.state.storage = storage
 
-        app.state.auth_service = AuthService(
-            session_factory, hasher, session_repo, signer
-        )
         app.state.user_service = UserService(
             session_factory, cache, storage, image, session_repo
+        )
+        app.state.auth_service = AuthService(
+            session_factory, hasher, session_repo, signer, app.state.user_service
         )
         app.state.post_service = PostService(session_factory, cache, storage, image)
         app.state.comment_service = CommentService(session_factory, storage)

@@ -21,6 +21,18 @@ async def test_register_happy(auth_service):
     assert username == "someone1"
 
 
+async def test_register_invalidates_users_feed_cache(
+    auth_service, user_service, user_factory
+):
+    await user_factory(username="existing1")
+    first = await user_service.list_feed(limit=10, offset=0)
+    assert first.total == 1
+    await auth_service.register(_register(username="freshone"))
+    refreshed = await user_service.list_feed(limit=10, offset=0)
+    assert refreshed.total == 2
+    assert {u.username for u in refreshed.items} == {"existing1", "freshone"}
+
+
 async def test_register_duplicate(auth_service, user_factory):
     await user_factory(username="someone1")
     with pytest.raises(UsernameAlreadyTakenError):

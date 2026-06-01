@@ -57,7 +57,7 @@ class UserService:
         version = await self._cache.get(USERS_FEED_VERSION_KEY) or "0"
         return f"users:feed:lite:v{version}:l{limit}:o{offset}"
 
-    async def _invalidate_feed_cache(self) -> None:
+    async def invalidate_feed_cache(self) -> None:
         new_version = await self._cache.incr(USERS_FEED_VERSION_KEY)
         logger.debug("users_feed_cache_invalidated version=%d", new_version)
 
@@ -140,7 +140,7 @@ class UserService:
             result = self._user_to_schema(user, bio)
             username = user.username
         await self._cache.delete(self._cache_key(username))
-        await self._invalidate_feed_cache()
+        await self.invalidate_feed_cache()
         logger.info(
             "user_updated user_id=%d username=%s fields=%s",
             user_id,
@@ -191,7 +191,7 @@ class UserService:
                 await self._storage.delete(old_key)
                 logger.debug("avatar_old_deleted key=%s", old_key)
         await self._cache.delete(self._cache_key(username))
-        await self._invalidate_feed_cache()
+        await self.invalidate_feed_cache()
         logger.info(
             "avatar_uploaded user_id=%d key=%s bytes=%d",
             user_id,
@@ -217,7 +217,7 @@ class UserService:
             await self._storage.delete(old_key)
             logger.debug("avatar_storage_deleted key=%s", old_key)
         await self._cache.delete(self._cache_key(username))
-        await self._invalidate_feed_cache()
+        await self.invalidate_feed_cache()
         logger.info("avatar_deleted user_id=%d key=%s", user_id, old_key)
 
     async def delete_me(self, user_id: int) -> None:
@@ -243,6 +243,6 @@ class UserService:
                 await self._storage.delete(old_avatar)
                 logger.debug("avatar_deleted_on_user_delete key=%s", old_avatar)
         await self._cache.delete(self._cache_key(old_username))
-        await self._invalidate_feed_cache()
+        await self.invalidate_feed_cache()
         await self._sessions.delete_all_for_user(user_id)
         logger.info("user_anonymized user_id=%d old_username=%s", user_id, old_username)

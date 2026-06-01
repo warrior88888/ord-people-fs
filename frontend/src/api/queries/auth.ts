@@ -32,7 +32,10 @@ export function useRegister() {
   return useMutation({
     mutationFn: (p: RegisterPayload) =>
       api.post<{ user_id: number; username: string }>("/auth/register", p),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ME_KEY }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ME_KEY });
+      qc.invalidateQueries({ queryKey: ["users"] });
+    },
   });
 }
 

@@ -13,6 +13,7 @@ if TYPE_CHECKING:
     from ord_people.infra.auth.session_repository import RedisSessionRepository
     from ord_people.infra.auth.session_signer import ItsDangerousSessionSigner
     from ord_people.schemas.auth import LoginSchema, RegisterSchema
+    from ord_people.services.user import UserService
 
 logger = logging.getLogger(__name__)
 
@@ -24,11 +25,13 @@ class AuthService:
         hasher: Argon2PasswordHasher,
         sessions: RedisSessionRepository,
         signer: ItsDangerousSessionSigner,
+        users: UserService,
     ) -> None:
         self._session_factory = session_factory
         self._hasher = hasher
         self._sessions = sessions
         self._signer = signer
+        self._users = users
 
     async def register(self, data: RegisterSchema) -> tuple[int, str]:
         logger.info("register_attempt username=%s", data.username)
@@ -45,6 +48,7 @@ class AuthService:
             )
             user_id = user.pk
             username = user.username
+        await self._users.invalidate_feed_cache()
         logger.info("user_registered user_id=%d username=%s", user_id, username)
         return user_id, username
 

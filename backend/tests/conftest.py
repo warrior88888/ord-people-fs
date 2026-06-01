@@ -116,18 +116,20 @@ def rate_limiter(redis_client) -> RateLimiter:
 
 
 @pytest_asyncio.fixture
-async def auth_service(
-    session_factory, hasher, session_repository, signer
-) -> AuthService:
-    return AuthService(session_factory, hasher, session_repository, signer)
-
-
-@pytest_asyncio.fixture
 async def user_service(
     session_factory, cache, storage, image_processor, session_repository
 ) -> UserService:
     return UserService(
         session_factory, cache, storage, image_processor, session_repository
+    )
+
+
+@pytest_asyncio.fixture
+async def auth_service(
+    session_factory, hasher, session_repository, signer, user_service
+) -> AuthService:
+    return AuthService(
+        session_factory, hasher, session_repository, signer, user_service
     )
 
 
