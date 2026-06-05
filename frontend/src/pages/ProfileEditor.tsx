@@ -240,10 +240,10 @@ export function ProfileEditor({ user, onDone }: { user: User; onDone: () => void
               value={about}
               onChange={setAbout}
               as="textarea"
-              max={512}
+              max={2000}
             />
             <p className="mt-1 text-xs text-[var(--color-muted)] text-right">
-              {about.length}/512
+              {about.length}/2000
             </p>
           </section>
 

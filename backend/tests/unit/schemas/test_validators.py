@@ -88,7 +88,7 @@ class TestPostCreateSchema:
             ("name", "xx"),
             ("name", "x" * 51),
             ("description", "short"),
-            ("description", "x" * 1001),
+            ("description", "x" * 5001),
             ("category", "invalid"),
             ("external_url", "not-a-url"),
         ],
@@ -178,7 +178,7 @@ class TestBioUpdateSchema:
 
     def test_about_too_long(self):
         with pytest.raises(ValidationError):
-            BioUpdateSchema(about="x" * 513)
+            BioUpdateSchema(about="x" * 2001)
 
     @pytest.mark.parametrize("mlink", ["https://max.ru/alice", "https://www.max.ru/y"])
     def test_max_valid(self, mlink):

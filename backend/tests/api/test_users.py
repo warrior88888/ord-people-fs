@@ -165,7 +165,7 @@ class TestUpdateBio:
             ("vk_link", "https://evil.com/x"),
             ("max_link", "https://yandex.ru/"),
             ("email", "not-an-email"),
-            ("about", "x" * 513),
+            ("about", "x" * 2001),
         ],
     )
     async def test_invalid(self, auth_client, field, value):

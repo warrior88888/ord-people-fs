@@ -238,12 +238,12 @@ export default function PostEditor() {
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               minLength={10}
-              maxLength={1000}
+              maxLength={5000}
               required
               placeholder="Расскажите подробно, что произошло, кому помогли, как присоединиться…"
             />
           </label>
-          <p className="mt-1 text-xs text-[var(--color-muted)] text-right">{description.length}/1000</p>
+          <p className="mt-1 text-xs text-[var(--color-muted)] text-right">{description.length}/5000</p>
         </section>
 
         <section>

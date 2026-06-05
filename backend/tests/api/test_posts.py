@@ -123,7 +123,7 @@ class TestCreate:
             ("name", below_min(3)),
             ("name", above_max(50)),
             ("description", below_min(10)),
-            ("description", above_max(1000)),
+            ("description", above_max(5000)),
             ("category", "invalid_cat"),
             ("external_url", "not-a-url"),
         ],
